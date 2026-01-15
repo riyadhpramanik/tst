@@ -4,24 +4,19 @@ import requests
 app = Flask(__name__)
 
 @app.route('/')
-def index():
+def home():
     return render_template('index.html')
 
-@app.route('/check_uid', methods=['POST'])
+@app.route('/api/check', methods=['POST'])
 def check_uid():
     uid = request.json.get('uid')
-    if not uid:
-        return jsonify({"error": "No UID provided"}), 400
+    external_api = f"https://region-info-52.vercel.app/region?uid={uid}"
     
-    # Calling the external API
-    api_url = f"https://region-info-52.vercel.app/region?uid={uid}"
     try:
-        response = requests.get(api_url)
-        data = response.json()
-        return jsonify(data)
+        response = requests.get(external_api)
+        return jsonify(response.json())
     except Exception as e:
-        return jsonify({"error": "Failed to connect to API"}), 500
+        return jsonify({"error": str(e)}), 500
 
-# Required for Vercel
 if __name__ == '__main__':
     app.run(debug=True)
