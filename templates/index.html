@@ -3,104 +3,115 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Game UID Checker</title>
+    <title>Account Info UI</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f0f2f5;
+            background-color: #f4f7f9;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
             margin: 0;
         }
-        .card {
-            background: white;
-            padding: 2rem;
+
+        .container {
+            background-color: white;
+            border: 1px solid #e1e8ed;
             border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            width: 100%;
-            max-width: 400px;
+            width: 450px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            overflow: hidden;
         }
-        h2 { margin-top: 0; color: #1c1e21; }
-        label { display: block; margin-bottom: 8px; font-weight: bold; color: #4b4f56; font-size: 14px; }
-        input {
+
+        /* Header Section */
+        .header {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            border-bottom: 1px solid #e1e8ed;
+        }
+
+        .number-circle {
+            background-color: #5d2da1;
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            margin-right: 12px;
+            font-size: 14px;
+        }
+
+        .header h2 {
+            margin: 0;
+            font-size: 18px;
+            color: #1a1a1a;
+            font-family: 'Georgia', serif; /* Matching the serif font style */
+        }
+
+        /* Form Body */
+        .content {
+            padding: 20px;
+        }
+
+        .label {
+            display: block;
+            font-weight: bold;
+            color: #0c1a3d;
+            margin-bottom: 8px;
+            font-size: 15px;
+            font-family: 'Georgia', serif;
+        }
+
+        input[type="text"] {
             width: 100%;
-            padding: 10px;
-            margin-bottom: 20px;
-            border: 1px solid #dddfe2;
+            padding: 12px 15px;
+            border: 1px solid #a3c4f3; /* Light blue border */
             border-radius: 6px;
             box-sizing: border-box;
             font-size: 16px;
+            margin-bottom: 15px;
+            outline: none;
         }
-        button {
-            width: 100%;
-            padding: 12px;
-            background-color: #2e64e5;
+
+        input::placeholder {
+            color: #bdc3c7;
+        }
+
+        /* Bottom Error/Status Bar */
+        .status-bar {
+            background: linear-gradient(to bottom, #8a1d0b 0%, #d83d1c 100%);
             color: white;
-            border: none;
-            border-radius: 6px;
-            font-weight: bold;
-            cursor: pointer;
-            font-size: 16px;
-        }
-        button:hover { background-color: #2655c4; }
-        #result {
-            margin-top: 15px;
             text-align: center;
+            padding: 10px;
+            border-radius: 8px;
             font-size: 14px;
-            min-height: 20px;
+            font-weight: 500;
+            cursor: default;
         }
-        .error { color: #fa3e3e; }
-        .success { color: #28a745; font-weight: bold; }
     </style>
 </head>
 <body>
 
-<div class="card">
-    <h2>Game UID Checker</h2>
-    <label for="uidInput">Player ID</label>
-    <input type="number" id="uidInput" placeholder="Enter UID (Numbers only)">
-    
-    <button id="checkBtn" onclick="checkUID()">Check ID</button>
-    
-    <div id="result"></div>
+<div class="container">
+    <div class="header">
+        <div class="number-circle">2</div>
+        <h2>Account Info</h2>
+    </div>
+
+    <div class="content">
+        <label class="label">Player Id</label>
+        <input type="text" placeholder="Player ID (UID)">
+        
+        <div class="status-bar">
+            Please enter a valid Player ID.
+        </div>
+    </div>
 </div>
-
-<script>
-    async function checkUID() {
-        const uid = document.getElementById('uidInput').value;
-        const resultDiv = document.getElementById('result');
-        const checkBtn = document.getElementById('checkBtn');
-        
-        if (!uid) return;
-
-        resultDiv.innerHTML = "Checking...";
-        
-        try {
-            const response = await fetch('/check_uid', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ uid: uid })
-            });
-            const data = await response.json();
-
-            if (data.nickname) {
-                // Success case (Photo 2 logic)
-                resultDiv.className = "success";
-                resultDiv.innerHTML = `Found: ${data.nickname}`;
-                checkBtn.innerText = data.nickname; // Changes button text to nickname
-            } else {
-                // Error case (Photo 3/4 logic)
-                resultDiv.className = "error";
-                resultDiv.innerHTML = "Player not found";
-                checkBtn.innerText = "Check ID";
-            }
-        } catch (error) {
-            resultDiv.innerHTML = "Error connecting to server";
-        }
-    }
-</script>
 
 </body>
 </html>
