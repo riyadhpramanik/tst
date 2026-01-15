@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Account Info UI</title>
+    <title>Account Info</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -50,7 +50,7 @@
             margin: 0;
             font-size: 18px;
             color: #1a1a1a;
-            font-family: 'Georgia', serif; /* Matching the serif font style */
+            font-family: 'Georgia', serif;
         }
 
         /* Form Body */
@@ -67,10 +67,10 @@
             font-family: 'Georgia', serif;
         }
 
-        input[type="text"] {
+        input[type="number"] {
             width: 100%;
             padding: 12px 15px;
-            border: 1px solid #a3c4f3; /* Light blue border */
+            border: 1px solid #a3c4f3;
             border-radius: 6px;
             box-sizing: border-box;
             font-size: 16px;
@@ -78,20 +78,24 @@
             outline: none;
         }
 
-        input::placeholder {
-            color: #bdc3c7;
-        }
-
-        /* Bottom Error/Status Bar */
-        .status-bar {
+        /* Red Gradient Button */
+        #checkBtn {
+            width: 100%;
             background: linear-gradient(to bottom, #8a1d0b 0%, #d83d1c 100%);
             color: white;
             text-align: center;
-            padding: 10px;
+            padding: 12px;
             border-radius: 8px;
-            font-size: 14px;
+            font-size: 16px;
             font-weight: 500;
-            cursor: default;
+            border: none;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        #checkBtn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
         }
     </style>
 </head>
@@ -105,13 +109,50 @@
 
     <div class="content">
         <label class="label">Player Id</label>
-        <input type="text" placeholder="Player ID (UID)">
+        <input type="number" id="uidInput" placeholder="Player ID (UID)">
         
-        <div class="status-bar">
-            Please enter a valid Player ID.
-        </div>
+        <button id="checkBtn" onclick="checkUID()">Check UID</button>
     </div>
 </div>
+
+<script>
+    async function checkUID() {
+        const uidInput = document.getElementById('uidInput');
+        const checkBtn = document.getElementById('checkBtn');
+        const uid = uidInput.value;
+
+        if (!uid) {
+            checkBtn.innerText = "Please enter a UID";
+            return;
+        }
+
+        checkBtn.innerText = "Checking...";
+        checkBtn.disabled = true;
+
+        try {
+            const response = await fetch('/api/check', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ uid: uid })
+            });
+            const data = await response.json();
+
+            // Logic: If nickname exists (Photo 2), show nickname. 
+            // If not found (Photo 3/4), show error message on button.
+            if (data.nickname) {
+                checkBtn.innerText = data.nickname;
+            } else if (data.message) {
+                checkBtn.innerText = "Player not found";
+            } else {
+                checkBtn.innerText = "Error occurred";
+            }
+        } catch (error) {
+            checkBtn.innerText = "Connection Error";
+        } finally {
+            checkBtn.disabled = false;
+        }
+    }
+</script>
 
 </body>
 </html>
